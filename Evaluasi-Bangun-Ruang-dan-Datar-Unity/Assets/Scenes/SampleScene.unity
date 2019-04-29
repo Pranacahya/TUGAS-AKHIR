@@ -243,7 +243,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &118640929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -447,6 +447,7 @@ GameObject:
   - component: {fileID: 188685875}
   - component: {fileID: 188685878}
   - component: {fileID: 188685880}
+  - component: {fileID: 188685879}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -517,6 +518,21 @@ MonoBehaviour:
   pinch: {fileID: 0}
   handGO: {fileID: 0}
   pallete: {fileID: 884310502}
+--- !u!114 &188685879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 188685874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0ee41bdf384357459e218dcdebb4291, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pinchDetectors:
+  - {fileID: 2082252616}
+  pallete: {fileID: 884310503}
 --- !u!114 &188685880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -533,14 +549,16 @@ MonoBehaviour:
   - {fileID: 2082252616}
   _material: {fileID: 2100000, guid: 1720c1faec7a71942b4805bf2ae08929, type: 2}
   _drawColor: {r: 1, g: 1, b: 1, a: 1}
-  drawMode: 0
-  _smoothingDelay: 0.1
-  _drawRadius: 0.001
+  _smoothingDelay: 0.001
+  _drawRadius: 0.01
   _drawResolution: 8
   _minSegmentLength: 0.027
   _palette: {fileID: 884310502}
   pos: {fileID: 326612941}
   dir: {fileID: 1307436148}
+  LineTransform: {fileID: 8353693386341802477, guid: 1bdda67e872ead64eb67fff3ac741382,
+    type: 3}
+  RTexture: {fileID: 8400000, guid: 9d0a1daa2e1737a42abc69e0d5c9d1b3, type: 2}
 --- !u!1001 &213161024
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1131,6 +1149,12 @@ CanvasRenderer:
 --- !u!1 &884310502 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9082424844831913824, guid: c85e46396b7f2264fac8aba0c331215d,
+    type: 3}
+  m_PrefabInstance: {fileID: 9082424845577680518}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &884310503 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9082424844831913825, guid: c85e46396b7f2264fac8aba0c331215d,
     type: 3}
   m_PrefabInstance: {fileID: 9082424845577680518}
   m_PrefabAsset: {fileID: 0}

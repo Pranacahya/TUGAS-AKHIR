@@ -318,6 +318,7 @@
     <Compile Include="Assets\script\LeapDraw.cs" />
     <Compile Include="Assets\script\LeapRTS.cs" />
     <Compile Include="Assets\script\LineDrawable.cs" />
+    <Compile Include="Assets\script\LineHelper.cs" />
     <Compile Include="Assets\script\MeshBuilder.cs" />
     <Compile Include="Assets\script\MouseDrawing.cs" />
     <Compile Include="Assets\script\PinchCheck.cs" />
@@ -352,19 +353,19 @@
     <None Include="Assets\PDollar\Resources\GestureSet\10-stylus-MEDIUM\10-stylus-medium-N-01.xml" />
     <None Include="Assets\PDollar\Resources\GestureSet\10-stylus-MEDIUM\10-stylus-medium-P-01.xml" />
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -571,16 +572,16 @@
       <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="InteractionEngineUtility">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Assets/LeapMotion/Modules/InteractionEngine/Plugins/InteractionEngineUtility.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Assets/LeapMotion/Modules/InteractionEngine/Plugins/InteractionEngineUtility.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>D:/TA/Evaluasi-Psikomotorik-Bangun-Ruang/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>D:/TA/Apps/TUGAS-AKHIR/Evaluasi-Bangun-Ruang-dan-Datar-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

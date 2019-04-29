@@ -15,47 +15,62 @@ namespace Leap.Unity.DetectionExamples
 
         private LinkedList<Vector3> points;
 
+        private IDrawable _drawAble;
 
+        //Fungsi pinch detectir dari leap motion
         [SerializeField]
         private PinchDetector[] _pinchDetectors;
 
+        //Material untuk garis
         [SerializeField]
         private Material _material;
 
+        //Warna garis
         [SerializeField]
         private Color _drawColor = Color.white;
 
-        [SerializeField]
-        private int drawMode = 0;
-
+        //Refresh rate menggambar garis
         [SerializeField]
         private float _smoothingDelay = 0.01f;
 
+        //jari-jari lingkaran garis
         [SerializeField]
         private float _drawRadius = 0.002f;
 
+        //?????????
         [SerializeField]
         private int _drawResolution = 8;
 
+        //?????????
         [SerializeField]
         private float _minSegmentLength = 0.005f;
 
+        //GameObject palette untuk menggambar
         [SerializeField]
         private GameObject _palette;
 
-        private DrawState[] _drawStates;
-        private GameObject Parent;
-        private int test = 0;
         public GameObject pos;
         public GameObject dir;
+
+        private Mesh _meshHelper;
+        private DrawState[] _drawStates;
+        private GameObject Parent;
+        private Vector3 helpPosStart;
+        private Vector3 helpPosEnd;
         private Vector3 startV3 = Vector3.zero;
         private Vector3 endV3 = Vector3.zero;
         private Vector3 startPoint = Vector3.zero;
         private Vector3 endPoint = Vector3.zero;
         private RaycastDraw RD = new RaycastDraw();
 
+        //helperline attribute
+        public Transform LineTransform;
+        private LineRenderer currentLineRender;
+        public RenderTexture RTexture;
+        private int countVertex = 0;
         void Start()
         {
+            //Cek apakah leapmotion membaaca adanya fungsi pinch
             _drawStates = new DrawState[_pinchDetectors.Length];
             for (int i = 0; i < _pinchDetectors.Length; i++)
             {
@@ -74,19 +89,6 @@ namespace Leap.Unity.DetectionExamples
             {
                 _drawRadius = value;
             }
-        }
-        //Line Configuration
-        public int DrawModes
-        {
-            get
-            {
-                return drawMode;
-            }
-            set
-            {
-                drawMode = value;
-            }
-
         }
 
         public static Stopwatch stopWatch = new Stopwatch();
@@ -113,41 +115,36 @@ namespace Leap.Unity.DetectionExamples
 
         void FixedUpdate()
         {
+            //LineRenderer lineHelper = gameObject.AddComponent<LineRenderer>();
             RaycastHit[] hits;
+      
             hits = Physics.RaycastAll(pos.transform.position, dir.transform.position, 100.0F);
-            Vector3 pis = RaycastDraw.hitPos;
-
-
             for (int i = 0; i < _pinchDetectors.Length; i++)
             {
+                
                 var detector = _pinchDetectors[i];
                 var drawState = _drawStates[i];
-                //if ()
-                //{
-                //    if (hit.collider.name == "palette")
-                //    {
-                //        print("hit at : " + hit.point);
-                //        DrawLine(transform.position, hit.point, color);
-                //    }
-                //    Debug.DrawLine(transform.position, -Vector3.up, color);
-
-                //}
                 if (detector.DidStartHold)
-                {
+                {                  
+                    //lineHelper.material = new Material(Shader.Find("Sprites/Default"));
+                    //lineHelper.widthMultiplier = 0.2f;
+                    //lineHelper.positionCount = 2;
+
+                    helpPosStart = detector.Position;
+                    UnityEngine.Debug.Log(detector.Position + " = " + helpPosStart);
                     points.Clear();
-                    points.AddLast(detector.Position);
+                    points.AddLast(detector.Position);          
                     startV3 = detector.Position;
                     startPoint = pos.transform.position;
                     GameObject temp = drawState.BeginNewLine();
-
                     if (temp)
                     {
                         Parent = temp;
                     }
-
+                   
                 }
                 if (detector.IsHolding)
-                {
+                {  
                     Vector3 linePosition = new Vector3(detector.Position.x, detector.Position.y, _palette.transform.position.z);
                     drawState.UpdateLine(linePosition);
                     points.AddLast(detector.Position);
@@ -155,7 +152,12 @@ namespace Leap.Unity.DetectionExamples
 
                 if (detector.DidRelease)
                 {
-                    UnityEngine.Debug.Log("Stop holding");
+                    helpPosEnd = detector.Position;
+                    UnityEngine.Debug.Log("Test " + helpPosStart + " " + helpPosEnd);
+
+                    //lineHelper.SetPosition(0, helpPosStart);
+                    //lineHelper.SetPosition(1, helpPosEnd);
+
                     points.AddLast(detector.Position);
                     endV3 = detector.Position;
                     endPoint = endV3;
@@ -164,7 +166,7 @@ namespace Leap.Unity.DetectionExamples
                     stopWatch.Stop();
                     TimeSpan ts = stopWatch.Elapsed;
                     string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-                    UnityEngine.Debug.Log("RunTime " + elapsedTime);
+                    //UnityEngine.Debug.Log("RunTime " + elapsedTime);
                     if (Parent)
                     {
                         Destroy(Parent.transform.parent.gameObject);
@@ -174,18 +176,42 @@ namespace Leap.Unity.DetectionExamples
                     _mesh.name = "Line Mesh";
                     _mesh.MarkDynamic();
 
+
+                    Vector3[] res = _drawAble.Draw(points.ToArray());
+                    GameObject lineHelperGO = new GameObject("Line Helper");
+                    //lineHelperGO.AddComponent<LineRenderer>();
+                    //LineRenderer lineSave2 = lineHelperGO.GetComponent<LineRenderer>();
+
                     GameObject lineObj = new GameObject("Line Object");
                     lineObj.AddComponent<LineRenderer>();
                     LineRenderer lineSave = lineObj.GetComponent<LineRenderer>();
+
+                    lineSave.positionCount = res.Length;
+                    lineSave.SetPositions(res);
+                    lineSave.useWorldSpace = false;
+                    lineSave.material = _material;
+                    lineSave.SetColors(_drawColor, _drawColor);
+
+                    //lineSave.BakeMesh(_mesh, true);
+                    //lineSave.transform.localScale = Vector3.one;
+                    lineSave.SetWidth(0.01f, 0.01f);
                     //lineObj.transform.localScale = Vector3.one;
                     //lineObj.AddComponent<MeshFilter>().mesh = _mesh;
                     //lineObj.AddComponent<MeshRenderer>().sharedMaterial = _material;
                 }
+
             }
 
+        }
+        public void StartHelperDrawer()
+        {
 
         }
 
+        public void EndHelperDrawer()
+        {
+
+        }
 
         [System.Serializable]
         private class DrawState
@@ -439,6 +465,40 @@ namespace Leap.Unity.DetectionExamples
                     Vector3 ringSpoke = rotator * normal * _parent._drawRadius * radiusScale;
                     _vertices[offset + i] = ringPosition + ringSpoke;
                 }
+            }
+            public GameObject StraightLineNew()
+            {
+                stopWatch.Reset();
+                stopWatch.Start();
+                _rings = 0;
+                _vertices.Clear();
+                _tris.Clear();
+                _uvs.Clear();
+                _colors.Clear();
+
+
+                _smoothedPosition.reset = true;
+
+                _mesh = new Mesh();
+
+                _mesh.name = "Line Mesh";
+                _mesh.MarkDynamic();
+
+
+                GameObject straightLine = new GameObject("Straight Line");
+                LineRenderer lineRenderer = straightLine.AddComponent<LineRenderer>();
+                lineRenderer.SetPositions(new Vector3[] { startPoint, endPoint });
+
+
+                //straightLine.transform.rotation = Quaternion.identity;
+                //straightLine.transform.localScale = Vector3.one;
+                //straightLine.AddComponent<MeshFilter>().mesh = _mesh;
+                // Mesh smesh = straightLine.GetComponent<MeshFilter>().sharedMesh;
+                //print(smesh.isReadable);
+                //straightLine.AddComponent<MeshRenderer>().sharedMaterial = _parent._material;
+                straightLine.AddComponent<LeapRTS>();
+
+                return straightLine;
             }
         }
     }
