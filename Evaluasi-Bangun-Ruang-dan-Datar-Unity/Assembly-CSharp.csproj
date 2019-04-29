@@ -311,6 +311,7 @@
     <Compile Include="Assets\PDollar\Scripts\PDollarGestureRecognizer\Point.cs" />
     <Compile Include="Assets\PDollar\Scripts\PDollarGestureRecognizer\PointCloudRecognizer.cs" />
     <Compile Include="Assets\PDollar\Scripts\PDollarGestureRecognizer\Result.cs" />
+    <Compile Include="Assets\script\ExamDisplayer.cs" />
     <Compile Include="Assets\script\GridRenderer.cs" />
     <Compile Include="Assets\script\HandsCollider.cs" />
     <Compile Include="Assets\script\IDrawable.cs" />
