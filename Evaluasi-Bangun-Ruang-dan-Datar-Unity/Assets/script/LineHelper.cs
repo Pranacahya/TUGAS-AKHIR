@@ -22,15 +22,18 @@ namespace Leap.Unity.DetectionExamples
         // Start is called before the first frame update
         void Awake()
         {
-
             lineHelper = this.gameObject.AddComponent<LineRenderer>();
-            lineHelper.SetWidth(0.008f, 0.008f);
+            lineHelper.startWidth = 0.008f;
+            lineHelper.endWidth = 0.008f;
             if (_pinchDetectors.Length == 0)
             {
                 UnityEngine.Debug.LogWarning("No pinch detectors were specified!  PinchDraw can not draw any lines without PinchDetectors.");
             }
         }
-
+        public void DeleteLine()
+        {
+            lineHelper.positionCount = 0;
+        }
         // Update is called once per frame
         void FixedUpdate()
         {
@@ -40,18 +43,14 @@ namespace Leap.Unity.DetectionExamples
                 var detector = _pinchDetectors[i];
                 if (detector.DidStartHold)
                 {
-                    startPos = detector.Position;
-                    startPos.z = pallete.transform.position.z - 0.01f;
+                    startPos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, pallete.transform.position.z - 0.01f);
+                    //startPis.z = pallete.transform.position.z - 0.01f;
                 }
 
                 if(detector.DidRelease)
                 {
-                    endPos = detector.Position;
-                    endPos.z = pallete.transform.position.z - 0.01f;
+                    endPos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, pallete.transform.position.z - 0.01f);
                     lineHelper.positionCount = 2;
-                    //positions[0] = startPos;
-                    //positions[1] = endPos;
-                    //lineHelper.positionCount = positions.Length;
                     lineHelper.SetPosition(0, startPos);
                     lineHelper.SetPosition(1, endPos);
                 }

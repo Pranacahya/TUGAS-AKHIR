@@ -7,49 +7,47 @@
 //using Debug = UnityEngine.Debug;
 
 //namespace Leap.Unity.DetectionExamples
-
 //{
-
 //    public class PinchDraw : MonoBehaviour
 //    {
-//        public HandsCollider handCol = new HandsCollider();
+//        //public HandsCollider handCol = new HandsCollider();
 //        [Tooltip("Each pinch detector can draw one line at a time.")]
 
 //        private LinkedList<Vector3> points;
 
 //        private IDrawable _drawAble;
 
-//        Fungsi pinch detectir dari leap motion
+//        //Fungsi pinch detectir dari leap motion
 //        [SerializeField]
 //        private PinchDetector[] _pinchDetectors;
 
 //        private LineScoring lineScore;
 
-//        Material untuk garis
+//        //Material untuk garis
 //        [SerializeField]
 //        private Material _material;
 
-//        Warna garis
+//        //Warna garis
 //        [SerializeField]
 //        private Color _drawColor = Color.white;
 
-//        Refresh rate menggambar garis
+//        //Refresh rate menggambar garis
 //        [SerializeField]
 //        private float _smoothingDelay = 0.01f;
 
-//        jari-jari lingkaran garis
+//        //jari-jari lingkaran garis
 //        [SerializeField]
 //        private float _drawRadius = 0.002f;
 
-//        ?????????
+//        //?????????
 //        [SerializeField]
 //        private int _drawResolution = 8;
 
-//        ?????????
+//        //?????????
 //        [SerializeField]
 //        private float _minSegmentLength = 0.005f;
 
-//        GameObject palette untuk menggambar
+//        //GameObject palette untuk menggambar
 //        [SerializeField]
 //        private GameObject _palette;
 
@@ -60,9 +58,10 @@
 //        public GameObject soalUI;
 //        public GameObject leftHand;
 
-//        private List<float[]> pointsToCheck = new List<float[]>();
+//        //private List<float[]> pointsToCheck = new List<float[]>();
 //        private List<float[]> pointsToCheck = new List<float[]>();
 //        private bool drawingStatus;
+//        private bool release = false;
 //        private string jawaban;
 //        private SoalClass presentSoal;
 //        private float[] Angle;
@@ -82,7 +81,7 @@
 //        private bool isHold = false;
 //        private bool isRelease = false;
 
-//        helperline attribute
+//        //helperline attribute
 //        public Transform LineTransform;
 //        private LineRenderer currentLineRender;
 //        public RenderTexture RTexture;
@@ -91,7 +90,7 @@
 //        {
 //            lineScore = new LineScoring();
 //            drawingStatus = false;
-//            Cek apakah leapmotion membaaca adanya fungsi pinch
+//            //Cek apakah leapmotion membaaca adanya fungsi pinch
 //            _drawStates = new DrawState[_pinchDetectors.Length];
 //            for (int i = 0; i < _pinchDetectors.Length; i++)
 //            {
@@ -101,7 +100,7 @@
 
 //        public void Update()
 //        {
-//            if (leftHand.active)
+//            if (leftHand.activeSelf)
 //            {
 //                soalUI.SetActive(true);
 //            }
@@ -112,7 +111,7 @@
 //        }
 
 
-//        Line configruation
+//        //Line configruation
 //        public float DrawRadius
 //        {
 //            get
@@ -137,7 +136,7 @@
 //        void Awake()
 //        {
 //            points = new LinkedList<Vector3>();
-//            drawAble = new TriDrawable();
+//            //drawAble = new  TriDrawable();
 //            if (_pinchDetectors.Length == 0)
 //            {
 //                UnityEngine.Debug.LogWarning("No pinch detectors were specified!  PinchDraw can not draw any lines without PinchDetectors.");
@@ -153,11 +152,20 @@
 //            }
 //        }
 
+//        private IEnumerator ActivateRelease()
+//        {
+//            while (true)
+//            {
+//                yield return new WaitForSeconds(1f);
+//                release = false;
+//            }
+//        }
+
 
 //        void FixedUpdate()
 //        {
 //            Vector2 tempPos;
-//            LineRenderer lineHelper = gameObject.AddComponent<LineRenderer>();
+//            //LineRenderer lineHelper = gameObject.AddComponent<LineRenderer>();
 //            for (int i = 0; i < _pinchDetectors.Length; i++)
 //            {
 //                var detector = _pinchDetectors[i];
@@ -165,12 +173,8 @@
 //                if (detector.DidStartHold && isHold == false)
 //                {
 //                    lineCounter++;
-//                    lineHelper.material = new Material(Shader.Find("Sprites/Default"));
-//                    lineHelper.widthMultiplier = 0.2f;
-//                    lineHelper.positionCount = 2;
 //                    isHold = true;
 //                    StartCoroutine(ActivateOnHold());
-//                    UnityEngine.Debug.Log("masuk awal");
 //                    Rigidbody sphereRB;
 //                    Rigidbody sphereRB2;
 //                    if (drawingStatus == false)
@@ -182,6 +186,7 @@
 //                        pointsToCheck.Add(tempPos12);
 //                        drawingStatus = true;
 //                    }
+//                    //Bola bantu inisiasi
 //                    mySphere2 = Instantiate(sphere, new Vector3(detector.transform.position.x, detector.transform.position.y, _palette.transform.position.z), Quaternion.identity);
 //                    mySphere2.AddComponent<PositionsDetector>();
 //                    mySphere2.AddComponent<Rigidbody>();
@@ -193,6 +198,7 @@
 //                    Vector3 spherePos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
 //                    mySphere2.transform.position = spherePos;
 
+//                    //Bola bantu
 //                    mySphere = Instantiate(sphere, new Vector3(detector.transform.position.x, detector.transform.position.y, _palette.transform.position.z), Quaternion.identity);
 //                    mySphere.AddComponent<PositionsDetector>();
 //                    mySphere.AddComponent<Rigidbody>();
@@ -216,17 +222,18 @@
 //                    pointsToCheck.Add(tempPos12);
 //                    Vector3 spherePos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
 //                    mySphere.transform.position = spherePos;
-//                    foreach (Vector3 a in arrayPoint)
-//                    {
-//                        UnityEngine.Debug.Log(arrayPoint.Count + " " + a);
-//                    }
+//                    //foreach(Vector3 a in arrayPoint)
+//                    //{
+//                    //    UnityEngine.Debug.Log(arrayPoint.Count + " " + a);
+//                    //} 
 //                    Vector3 linePosition = new Vector3(detector.Position.x, detector.Position.y, _palette.transform.position.z);
 //                    drawState.UpdateLine(linePosition);
 //                    points.AddLast(detector.Position);
 //                }
-
-//                if (detector.DidRelease)
+//                if (detector.DidRelease && release == false)
 //                {
+//                    release = true;
+//                    StartCoroutine(ActivateRelease());
 //                    float[] tempPos12 = { (Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f };
 //                    pointsToCheck.Add(tempPos12);
 //                    Vector2 releasePosFixed;
@@ -239,16 +246,12 @@
 
 //                    stopWatch.Stop();
 //                    TimeSpan ts = stopWatch.Elapsed;
-//                    string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-//                    Debug.Log(pointsToCheck[0][0]);
-//                    Debug.Log(pointsToCheck[0][1]);
-//                    Debug.Log(pointsToCheck[1][0]);
-//                    Debug.Log(pointsToCheck[1][1]);
-//                    Debug.Log(pointsToCheck.Count());
-//                    if (detector.transform.position.x == pointsToCheck[1][0])
-//                    {
-//                        Debug.Log("masuk");
-//                    }
+//                    //string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+//                    //Debug.Log(pointsToCheck[0][0]);
+//                    //Debug.Log(pointsToCheck[0][1]);
+//                    //Debug.Log(pointsToCheck[1][0]);
+//                    //Debug.Log(pointsToCheck[1][1]);
+//                    //Debug.Log(pointsToCheck.Count());
 //                    lineScore.SetFunction(pointsToCheck[0][0], pointsToCheck[0][1], pointsToCheck[pointsToCheck.Count - 1][0], pointsToCheck[pointsToCheck.Count - 1][1]);
 //                    Debug.Log(lineScore.Scoring(pointsToCheck));
 //                    pointsToCheck.Clear();
@@ -259,65 +262,63 @@
 //                        drawingStatus = false;
 //                        UnityEngine.Debug.Log("Shaped");
 //                        AngleGenerator();
-//                        lineCounter = 0;
 //                    }
 //                    else if (releasePosFixed != arrayPoint[arrayPoint.Count - 1])
 //                    {
 //                        arrayPoint.Add(releasePosFixed);
 //                    }
 
-//                    if (Parent)
-//                    {
-//                        Destroy(Parent.transform.parent.gameObject);
-//                    }
-//                    Parent = null;
-//                    _mesh = new Mesh();
-//                    _mesh.name = "Line Mesh";
-//                    _mesh.MarkDynamic();
-//                    Vector3[] res = _drawAble.Draw(points.ToArray());
-//                    GameObject lineHelperGO = new GameObject("Line Helper");
-//                    lineHelperGO.AddComponent<LineRenderer>();
-//                    LineRenderer lineSave2 = lineHelperGO.GetComponent<LineRenderer>();
 
-//                    GameObject lineObj = new GameObject("Line Object");
-//                    lineObj.tag = "line";
-//                    lineObj.AddComponent<LineRenderer>();
-//                    LineRenderer lineSave = lineObj.GetComponent<LineRenderer>();
+//                    //if (Parent)
+//                    //{
+//                    //    Destroy(Parent.transform.parent.gameObject);
+//                    //}
 
-//                    lineSave.positionCount = res.Length;
-//                    lineSave.SetPositions(res);
-//                    lineSave.useWorldSpace = false;
-//                    lineSave.material = _material;
-//                    lineSave.SetColors(_drawColor, _drawColor);
+//                    //Parent = null;
+//                    //_mesh = new Mesh();
+//                    //_mesh.name = "Line Mesh";
+//                    //_mesh.MarkDynamic();
+//                    //Vector3[] res = _drawAble.Draw(points.ToArray());
+//                    //GameObject lineHelperGO = new GameObject("Line Helper");
+//                    //lineHelperGO.AddComponent<LineRenderer>();
+//                    //LineRenderer lineSave2 = lineHelperGO.GetComponent<LineRenderer>();
 
-//                    lineSave.BakeMesh(_mesh, true);
-//                    lineSave.transform.localScale = Vector3.one;
-//                    lineSave.SetWidth(1f, 1f);
-//                    lineObj.transform.localScale = Vector3.one;
-//                    lineObj.AddComponent<MeshFilter>().mesh = _mesh;
-//                    lineObj.AddComponent<MeshRenderer>().sharedMaterial = _material;
+//                    //GameObject lineObj = new GameObject("Line Object");
+//                    //lineObj.tag = "line";
+//                    //lineObj.AddComponent<LineRenderer>();
+//                    //LineRenderer lineSave = lineObj.GetComponent<LineRenderer>();
 
+//                    //lineSave.positionCount = res.Length;
+//                    //lineSave.SetPositions(res);
+//                    //lineSave.useWorldSpace = false;
+//                    //lineSave.material = _material;
+//                    //lineSave.SetColors(_drawColor, _drawColor);
 
+//                    //lineSave.BakeMesh(_mesh, true);
+//                    //lineSave.transform.localScale = Vector3.one;
+//                    //lineSave.SetWidth(1f, 1f);
+//                    //lineObj.transform.localScale = Vector3.one;
+//                    //lineObj.AddComponent<MeshFilter>().mesh = _mesh;
+//                    //lineObj.AddComponent<MeshRenderer>().sharedMaterial = _material;
 //                }
 //            }
 
 //        }
 
-//        private void showArray()
-//        {
-//            foreach (Vector2 a in arrayPoint)
-//            {
-//                Debug.Log(a);
-//            }
-//            AngleGenerator();
-//        }
+//        //private void showArray()
+//        //{
+//        //    foreach(Vector2 a in arrayPoint)
+//        //    {
+//        //        Debug.Log(a);
+//        //    }
+//        //}
 
 //        private void ShapeRecognition(float[] point, int length)
 //        {
 //            string shape;
 //            string jawaban;
 //            shape = "";
-//            Segiempat
+//            //Segiempat
 //            if (length == 4)
 //            {
 //                if (point[0] == 90 || point[1] == 90 || point[2] == 90 || point[3] == 90)
@@ -325,7 +326,7 @@
 //                    shape = "Persegi";
 //                }
 //            }
-//            Segitiga
+//            //Segitiga
 //            else if (length == 3)
 //            {
 //                shape = "Segitiga";
@@ -346,15 +347,16 @@
 
 //        public void DeletAllLine()
 //        {
+//            lineCounter = 0;
 //            Debug.Log("delete all obj");
-//            Destroy all sphere game object
+//            //Destroy all sphere game object
 //            GameObject[] sphere = GameObject.FindGameObjectsWithTag("sphere");
 //            foreach (GameObject go in sphere)
 //            {
 //                Destroy(go);
 //            }
 
-//            Destroy all line game object
+//            //Destroy all line game object
 //            GameObject[] line = GameObject.FindGameObjectsWithTag("line");
 //            foreach (GameObject go in line)
 //            {
@@ -368,7 +370,7 @@
 //            int a;
 //            int b;
 //            float[] ad = new float[arrayPoint.Count];
-//            Mencari verteks dari garis yang dibuat
+//            //Mencari verteks dari garis yang dibuat
 //            for (int i = 0; i < arrayPoint.Count; i++)
 //            {
 //                a = (i + 1) % arrayPoint.Count;
@@ -445,7 +447,7 @@
 //                GameObject lineObj = new GameObject("Line Object");
 //                lineObj.tag = "line";
 //                lineObj.transform.position = Vector3.zero;
-//                lineObj.transform.position = _palette.transform.position;
+//                //lineObj.transform.position = _palette.transform.position;
 //                lineObj.transform.rotation = Quaternion.identity;
 //                lineObj.transform.localScale = Vector3.one;
 //                lineObj.AddComponent<MeshFilter>().mesh = _mesh;
@@ -477,7 +479,7 @@
 //            {
 
 //                _mesh.UploadMeshData(false);
-//                StraightLineNew();
+//                //StraightLineNew();   
 //            }
 
 
@@ -575,7 +577,7 @@
 //                }
 //            }
 
-//            Connects the most recently added vertex ring to the one before it
+//            //Connects the most recently added vertex ring to the one before it
 //            private void addTriSegment()
 //            {
 //                for (int i = 0; i < _parent._drawResolution; i++)

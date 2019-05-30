@@ -5,7 +5,16 @@ using UnityEngine.UI;
 
 public class StickedProblem : MonoBehaviour
 {
-    public GameObject myGO;
+    
+    [SerializeField]
+    private GameObject myGO;
+
+    [SerializeField]
+    private GameObject eraserGO;
+
+    [SerializeField]
+    private GameObject handRB;
+
     public void Activate()
     {
         myGO.SetActive(true);
@@ -14,5 +23,17 @@ public class StickedProblem : MonoBehaviour
     public void Deactivate()
     {
         myGO.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if(handRB.activeSelf)
+        {
+            eraserGO.SetActive(true);
+        }
+        else
+        {
+            eraserGO.SetActive(false);
+        }
     }
 }

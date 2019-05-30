@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - palette
+  - sphere
+  - line
   layers:
   - Default
   - TransparentFX
