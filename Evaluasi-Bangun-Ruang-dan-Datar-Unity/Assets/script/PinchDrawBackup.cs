@@ -2,6 +2,7 @@
 //using System.Collections.Generic;
 //using System.Diagnostics;
 //using System;
+//using TMPro;
 //using System.Linq;
 //using System.Collections;
 //using Debug = UnityEngine.Debug;
@@ -51,6 +52,7 @@
 //        [SerializeField]
 //        private GameObject _palette;
 
+//        public TextMeshPro myName;
 //        public GameObject whiteBoard;
 //        public GameObject crosshair;
 //        public GameObject sphere;
@@ -58,21 +60,21 @@
 //        public GameObject soalUI;
 //        public GameObject leftHand;
 
+
 //        //private List<float[]> pointsToCheck = new List<float[]>();
+//        private LineHelper lineHelper;
 //        private List<float[]> pointsToCheck = new List<float[]>();
 //        private bool drawingStatus;
 //        private bool release = false;
 //        private string jawaban;
 //        private SoalClass presentSoal;
 //        private float[] Angle;
-//        private int lineCounter = 0;
 //        private List<Vector2> arrayPoint = new List<Vector2>();
 //        private GameObject mySphere;
 //        private GameObject mySphere2;
 //        private Rigidbody rb;
 //        private Mesh _meshHelper;
 //        private DrawState[] _drawStates;
-//        private GameObject Parent;
 //        private Vector3 helpPosStart;
 //        private Vector3 helpPosEnd;
 //        private Vector3 startPoint = Vector3.zero;
@@ -80,7 +82,7 @@
 //        private RaycastDraw RD = new RaycastDraw();
 //        private bool isHold = false;
 //        private bool isRelease = false;
-
+//        private List<GameObject> prepareToUndo = new List<GameObject>();
 //        //helperline attribute
 //        public Transform LineTransform;
 //        private LineRenderer currentLineRender;
@@ -88,6 +90,8 @@
 //        private int countVertex = 0;
 //        void Start()
 //        {
+//            myName.text = PresentUser.Name;
+//            lineHelper = this.GetComponent<LineHelper>();
 //            lineScore = new LineScoring();
 //            drawingStatus = false;
 //            //Cek apakah leapmotion membaaca adanya fungsi pinch
@@ -96,6 +100,7 @@
 //            {
 //                _drawStates[i] = new DrawState(this);
 //            }
+//            Debug.Log(PresentUser.Name);
 //        }
 
 //        public void Update()
@@ -136,6 +141,7 @@
 //        void Awake()
 //        {
 //            points = new LinkedList<Vector3>();
+
 //            //drawAble = new  TriDrawable();
 //            if (_pinchDetectors.Length == 0)
 //            {
@@ -172,7 +178,6 @@
 //                var drawState = _drawStates[i];
 //                if (detector.DidStartHold && isHold == false)
 //                {
-//                    lineCounter++;
 //                    isHold = true;
 //                    StartCoroutine(ActivateOnHold());
 //                    Rigidbody sphereRB;
@@ -211,10 +216,7 @@
 //                    points.Clear();
 //                    points.AddLast(detector.Position);
 //                    GameObject temp = drawState.BeginNewLine();
-//                    if (temp)
-//                    {
-//                        Parent = temp;
-//                    }
+//                    prepareToUndo.Add(temp);
 //                }
 //                if (detector.IsHolding)
 //                {
@@ -222,10 +224,7 @@
 //                    pointsToCheck.Add(tempPos12);
 //                    Vector3 spherePos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
 //                    mySphere.transform.position = spherePos;
-//                    //foreach(Vector3 a in arrayPoint)
-//                    //{
-//                    //    UnityEngine.Debug.Log(arrayPoint.Count + " " + a);
-//                    //} 
+
 //                    Vector3 linePosition = new Vector3(detector.Position.x, detector.Position.y, _palette.transform.position.z);
 //                    drawState.UpdateLine(linePosition);
 //                    points.AddLast(detector.Position);
@@ -246,12 +245,6 @@
 
 //                    stopWatch.Stop();
 //                    TimeSpan ts = stopWatch.Elapsed;
-//                    //string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-//                    //Debug.Log(pointsToCheck[0][0]);
-//                    //Debug.Log(pointsToCheck[0][1]);
-//                    //Debug.Log(pointsToCheck[1][0]);
-//                    //Debug.Log(pointsToCheck[1][1]);
-//                    //Debug.Log(pointsToCheck.Count());
 //                    lineScore.SetFunction(pointsToCheck[0][0], pointsToCheck[0][1], pointsToCheck[pointsToCheck.Count - 1][0], pointsToCheck[pointsToCheck.Count - 1][1]);
 //                    Debug.Log(lineScore.Scoring(pointsToCheck));
 //                    pointsToCheck.Clear();
@@ -259,7 +252,6 @@
 //                    releasePosFixed = new Vector2((Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f);
 //                    if (arrayPoint[0] == releasePosFixed)
 //                    {
-//                        drawingStatus = false;
 //                        UnityEngine.Debug.Log("Shaped");
 //                        AngleGenerator();
 //                    }
@@ -267,51 +259,10 @@
 //                    {
 //                        arrayPoint.Add(releasePosFixed);
 //                    }
-
-
-//                    //if (Parent)
-//                    //{
-//                    //    Destroy(Parent.transform.parent.gameObject);
-//                    //}
-
-//                    //Parent = null;
-//                    //_mesh = new Mesh();
-//                    //_mesh.name = "Line Mesh";
-//                    //_mesh.MarkDynamic();
-//                    //Vector3[] res = _drawAble.Draw(points.ToArray());
-//                    //GameObject lineHelperGO = new GameObject("Line Helper");
-//                    //lineHelperGO.AddComponent<LineRenderer>();
-//                    //LineRenderer lineSave2 = lineHelperGO.GetComponent<LineRenderer>();
-
-//                    //GameObject lineObj = new GameObject("Line Object");
-//                    //lineObj.tag = "line";
-//                    //lineObj.AddComponent<LineRenderer>();
-//                    //LineRenderer lineSave = lineObj.GetComponent<LineRenderer>();
-
-//                    //lineSave.positionCount = res.Length;
-//                    //lineSave.SetPositions(res);
-//                    //lineSave.useWorldSpace = false;
-//                    //lineSave.material = _material;
-//                    //lineSave.SetColors(_drawColor, _drawColor);
-
-//                    //lineSave.BakeMesh(_mesh, true);
-//                    //lineSave.transform.localScale = Vector3.one;
-//                    //lineSave.SetWidth(1f, 1f);
-//                    //lineObj.transform.localScale = Vector3.one;
-//                    //lineObj.AddComponent<MeshFilter>().mesh = _mesh;
-//                    //lineObj.AddComponent<MeshRenderer>().sharedMaterial = _material;
 //                }
 //            }
 
 //        }
-
-//        //private void showArray()
-//        //{
-//        //    foreach(Vector2 a in arrayPoint)
-//        //    {
-//        //        Debug.Log(a);
-//        //    }
-//        //}
 
 //        private void ShapeRecognition(float[] point, int length)
 //        {
@@ -340,15 +291,12 @@
 //            }
 //            else
 //            {
-//                Debug.Log("Jawaban anda salah, yang benar adalah : " + jawaban);
+//                Debug.Log("Jawaban bukan " + shape + ", yang benar adalah : " + jawaban);
 //            }
-//            DeletAllLine();
 //        }
 
 //        public void DeletAllLine()
 //        {
-//            lineCounter = 0;
-//            Debug.Log("delete all obj");
 //            //Destroy all sphere game object
 //            GameObject[] sphere = GameObject.FindGameObjectsWithTag("sphere");
 //            foreach (GameObject go in sphere)
@@ -362,8 +310,12 @@
 //            {
 //                Destroy(go);
 //            }
+//            drawingStatus = false;
 //            arrayPoint.Clear();
+//            lineHelper.DeleteLine();
+//            Debug.Log("delete all obj");
 //        }
+
 //        private void AngleGenerator()
 //        {
 //            int[] temp = new int[arrayPoint.Count];
@@ -382,16 +334,12 @@
 //            ShapeRecognition(ad, ad.Length);
 //        }
 
-//        public void StartHelperDrawer()
+//        public void Undo()
 //        {
-
+//            Debug.Log("count " + prepareToUndo.Count);
+//            Destroy(prepareToUndo[prepareToUndo.Count - 1]);
+//            prepareToUndo.RemoveLast();
 //        }
-
-//        public void EndHelperDrawer()
-//        {
-
-//        }
-
 //        [System.Serializable]
 //        private class DrawState
 //        {
@@ -399,7 +347,7 @@
 //            private List<int> _tris = new List<int>();
 //            private List<Vector2> _uvs = new List<Vector2>();
 //            private List<Color> _colors = new List<Color>();
-
+//            //private GameObject prepareToUndo;
 //            private PinchDraw _parent;
 
 //            private int _rings = 0;
@@ -453,7 +401,6 @@
 //                lineObj.AddComponent<MeshFilter>().mesh = _mesh;
 //                Mesh smesh = lineObj.GetComponent<MeshFilter>().sharedMesh;
 //                lineObj.AddComponent<MeshRenderer>().sharedMaterial = _parent._material;
-
 //                return lineObj;
 //            }
 
@@ -577,6 +524,10 @@
 //                }
 //            }
 
+//            //public GameObject GetUndoObj()
+//            //{
+//            //    return prepareToUndo;
+//            //}
 //            //Connects the most recently added vertex ring to the one before it
 //            private void addTriSegment()
 //            {

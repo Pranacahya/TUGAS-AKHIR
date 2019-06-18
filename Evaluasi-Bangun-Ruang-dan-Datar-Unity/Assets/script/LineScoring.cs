@@ -67,9 +67,8 @@ public class LineScoring : MonoBehaviour
 
     public int Scoring(List<float[]> points)
     {
-        //Debug.Log("Average : "+ AverageDistance(points));
+
         avg.Clear();
-        //Debug.Log(AverageDistance(points));
         if(AverageDistance(points) <= 0.02f)
         {
             score.Add(3);
@@ -95,11 +94,10 @@ public class LineScoring : MonoBehaviour
         {
             //Debug.Log("score count " + score.Count);
             totalScore += score[i];
-            //Debug.Log("Total score " + totalScore);
         }
         totalScore = Mathf.Round(totalScore/score.Count);
+        //Debug.Log("Total score real " + totalScore);
         score.Clear();
-
         return (int)totalScore;
     }
 }

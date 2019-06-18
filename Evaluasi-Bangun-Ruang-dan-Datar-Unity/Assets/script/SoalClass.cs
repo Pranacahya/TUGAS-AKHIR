@@ -6,6 +6,8 @@ public class SoalClass : MonoBehaviour
 {
     Texture2D shape;
     string answer;
+
+    List<GameObject> edge = new List<GameObject>();
     // Start is called before the first frame update
     public SoalClass()
     {
@@ -26,4 +28,15 @@ public class SoalClass : MonoBehaviour
     {
         return this.answer;
     }
+
+    public void SetAnswer(string answer)
+    {
+        this.answer = answer;
+    }
+
+    //public GameObject[] GetGameObject()
+    //{
+    //    SetChild();
+    //    return edge;
+    //}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System;
+using TMPro;
 using System.Linq;
 using System.Collections;
 using Debug = UnityEngine.Debug;
@@ -17,11 +18,14 @@ namespace Leap.Unity.DetectionExamples
 
         private IDrawable _drawAble;
 
+        [SerializeField]
+        TMP_Text tmWin;
+
         //Fungsi pinch detectir dari leap motion
         [SerializeField]
         private PinchDetector[] _pinchDetectors;
 
-        private LineScoring lineScore;
+        private  LineScoring lineScore;
 
         //Material untuk garis
         [SerializeField]
@@ -51,14 +55,27 @@ namespace Leap.Unity.DetectionExamples
         [SerializeField]
         private GameObject _palette;
 
+        [SerializeField]
+        ScoringDisplay scorePopUp = new ScoringDisplay();
+
+        public TextMeshPro myName;
         public GameObject whiteBoard;
         public GameObject crosshair;
         public GameObject sphere;
+        public GameObject sphere2;
         public ExamDisplayer examDisp;
         public GameObject soalUI;
         public GameObject leftHand;
 
+
         //private List<float[]> pointsToCheck = new List<float[]>();
+        private bool selesaiBool;
+        string shape;
+        int tempScore;
+        List<int> undoScore = new List<int>();
+        int totalGambar;
+        private bool shaped = false;
+        private List<GameObject> ballPoint = new List<GameObject>();
         private LineHelper lineHelper;
         private List<float[]> pointsToCheck = new List<float[]>();
         private bool drawingStatus;
@@ -66,14 +83,13 @@ namespace Leap.Unity.DetectionExamples
         private string jawaban;
         private SoalClass presentSoal;
         private float[] Angle;
-        private int lineCounter = 0;
         private List<Vector2> arrayPoint = new List<Vector2>();
         private GameObject mySphere;
         private GameObject mySphere2;
         private Rigidbody rb;
+        private int soalCounter;
         private Mesh _meshHelper;
         private DrawState[] _drawStates;
-        private GameObject Parent;
         private Vector3 helpPosStart;
         private Vector3 helpPosEnd;
         private Vector3 startPoint = Vector3.zero;
@@ -81,7 +97,7 @@ namespace Leap.Unity.DetectionExamples
         private RaycastDraw RD = new RaycastDraw();
         private bool isHold = false;
         private bool isRelease = false;
-
+        private List<GameObject> prepareToUndo = new List<GameObject>();
         //helperline attribute
         public Transform LineTransform;
         private LineRenderer currentLineRender;
@@ -89,6 +105,12 @@ namespace Leap.Unity.DetectionExamples
         private int countVertex = 0;
         void Start()
         {
+            selesaiBool = false;
+            tmWin.gameObject.SetActive(false);
+            totalGambar = 0;
+            tempScore = 0;
+            soalCounter = 0;
+            myName.text = PresentUser.Name;
             lineHelper = this.GetComponent<LineHelper>();
             lineScore = new LineScoring();
             drawingStatus = false;
@@ -98,6 +120,7 @@ namespace Leap.Unity.DetectionExamples
             {
                 _drawStates[i] = new DrawState(this);
             }
+            Debug.Log(PresentUser.Name);
         }
 
         public void Update()
@@ -138,6 +161,7 @@ namespace Leap.Unity.DetectionExamples
         void Awake()
         {
             points = new LinkedList<Vector3>();
+           
             //drawAble = new  TriDrawable();
             if (_pinchDetectors.Length == 0)
             {
@@ -167,123 +191,131 @@ namespace Leap.Unity.DetectionExamples
         void FixedUpdate()
         {
             Vector2 tempPos;
-            //LineRenderer lineHelper = gameObject.AddComponent<LineRenderer>();
-            for (int i = 0; i < _pinchDetectors.Length ; i++)
+            if(examDisp.jumlahSoal <0 && selesaiBool == false)
             {
-                var detector = _pinchDetectors[i];
-                var drawState = _drawStates[i];
-                if (detector.DidStartHold && isHold == false)
+                Selesai();
+                selesaiBool = true;
+            }
+            else if(selesaiBool == false)
+            {
+                for (int i = 0; i < _pinchDetectors.Length; i++)
                 {
-                    lineCounter++;
-                    isHold = true;
-                    StartCoroutine(ActivateOnHold());
-                    Rigidbody sphereRB;
-                    Rigidbody sphereRB2;
-                    if (drawingStatus == false)
+                    var detector = _pinchDetectors[i];
+                    var drawState = _drawStates[i];
+                    if (detector.DidStartHold && isHold == false)
                     {
-                        Debug.Log("dada");
-                        Vector2 pos = new Vector2((Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f);
-                        arrayPoint.Add(pos);
-                        float[] tempPos12 = { (Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f };
+                        isHold = true;
+                        StartCoroutine(ActivateOnHold());
+                        Rigidbody sphereRB;
+                        Rigidbody sphereRB2;
+
+                        //Jika pengguna mulai menggambar
+                        if (drawingStatus == false || ballPoint.Count == 0)
+                        {
+                            Vector2 pos = new Vector2((Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f);
+                            arrayPoint.Add(pos);
+                            float[] tempPos12 = { (Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f };
+                            pointsToCheck.Add(tempPos12);
+                            drawingStatus = true;
+                            //Bola bantu inisiasi
+                            mySphere2 = Instantiate(sphere2, new Vector3(detector.transform.position.x, detector.transform.position.y, _palette.transform.position.z), Quaternion.identity);
+                            mySphere2.AddComponent<PositionsDetector>();
+                            mySphere2.AddComponent<Rigidbody>();
+                            mySphere2.tag = "sphere";
+                            sphereRB2 = mySphere2.GetComponent<Rigidbody>();
+                            sphereRB2.freezeRotation = true;
+                            sphereRB2.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ |
+                                RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+                            Vector3 spherePos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
+                            mySphere2.transform.position = spherePos;
+                            ballPoint.Add(mySphere2);
+                        }
                         
+                        //Bola bantu
+                        mySphere = Instantiate(sphere, new Vector3(detector.transform.position.x, detector.transform.position.y, _palette.transform.position.z), Quaternion.identity);
+                        mySphere.AddComponent<PositionsDetector>();
+                        mySphere.AddComponent<Rigidbody>();
+                        mySphere.tag = "sphere";
+                        sphereRB = mySphere.GetComponent<Rigidbody>();
+                        sphereRB.freezeRotation = true;
+                        sphereRB.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ |
+                            RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+                        ballPoint.Add(mySphere);
+                        points.Clear();
+                        points.AddLast(detector.Position);
+                        GameObject temp = drawState.BeginNewLine();
+                        prepareToUndo.Add(temp);
+                    }
+                    if (detector.IsHolding )
+                    {
+                        float[] tempPos12 = { detector.transform.position.x + 1f, detector.transform.position.y - 0.4f };
                         pointsToCheck.Add(tempPos12);
-                        drawingStatus = true;   
+                        Vector3 spherePos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
+
+                        //Mengubah posisi bola bantu
+                        mySphere.transform.position = spherePos;
+
+                        Vector3 linePosition = new Vector3(detector.Position.x, detector.Position.y, _palette.transform.position.z);
+                        drawState.UpdateLine(linePosition);
+                        points.AddLast(detector.Position);
                     }
-                    //Bola bantu inisiasi
-                    mySphere2 = Instantiate(sphere, new Vector3(detector.transform.position.x, detector.transform.position.y, _palette.transform.position.z), Quaternion.identity);
-                    mySphere2.AddComponent<PositionsDetector>();
-                    mySphere2.AddComponent<Rigidbody>();
-                    mySphere2.tag = "sphere";
-                    sphereRB2 = mySphere2.GetComponent<Rigidbody>();
-                    sphereRB2.freezeRotation = true;
-                    sphereRB2.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ |
-                        RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-                    Vector3 spherePos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
-                    mySphere2.transform.position = spherePos;
-
-                    //Bola bantu
-                    mySphere = Instantiate(sphere, new Vector3(detector.transform.position.x, detector.transform.position.y, _palette.transform.position.z), Quaternion.identity);
-                    mySphere.AddComponent<PositionsDetector>();
-                    mySphere.AddComponent<Rigidbody>();
-                    mySphere.tag = "sphere";
-                    sphereRB = mySphere.GetComponent<Rigidbody>();
-                    sphereRB.freezeRotation = true;
-                    sphereRB.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ |
-                        RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-
-                    points.Clear();
-                    points.AddLast(detector.Position);          
-                    GameObject temp = drawState.BeginNewLine();
-                    if (temp)
+                    if (detector.DidRelease && release == false)
                     {
-                        Parent = temp;
-                    }
-                }
-                if (detector.IsHolding)
-                {
-                    float[] tempPos12 = { detector.transform.position.x + 1f, detector.transform.position.y - 0.4f };
-                    pointsToCheck.Add(tempPos12);
-                    Vector3 spherePos = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
-                    mySphere.transform.position = spherePos;
-                    //foreach(Vector3 a in arrayPoint)
-                    //{
-                    //    UnityEngine.Debug.Log(arrayPoint.Count + " " + a);
-                    //} 
-                    Vector3 linePosition = new Vector3(detector.Position.x, detector.Position.y, _palette.transform.position.z);
-                    drawState.UpdateLine(linePosition);
-                    points.AddLast(detector.Position);
-                }
-                if (detector.DidRelease && release == false)
-                {
-                    release = true;
-                    StartCoroutine(ActivateRelease());
-                    float[] tempPos12 = { (Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f };
-                    pointsToCheck.Add(tempPos12);
-                    Vector2 releasePosFixed;
-                    isRelease = true;
-                    releasePos = new Vector2((Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f);
-                    helpPosEnd = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
-                    tempPos = new Vector2(helpPosEnd.x + 1f, helpPosEnd.y - 0.4f);
-                    points.AddLast(detector.Position);
-                    drawState.FinishLine();
+                        release = true;
+                        StartCoroutine(ActivateRelease());
+                        soalCounter++;
+                        float[] tempPos12 = { (Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f };
+                        pointsToCheck.Add(tempPos12);
+                        Vector2 releasePosFixed;
+                        isRelease = true;
+                        releasePos = new Vector2((Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f);
+                        helpPosEnd = new Vector3(Mathf.Round(detector.transform.position.x * 10f) / 10f, Mathf.Round(detector.transform.position.y * 10f) / 10f, Mathf.Round(_palette.transform.position.z * 10f) / 10f);
+                        tempPos = new Vector2(helpPosEnd.x + 1f, helpPosEnd.y - 0.4f);
+                        points.AddLast(detector.Position);
+                        drawState.FinishLine();
 
-                    stopWatch.Stop();
-                    TimeSpan ts = stopWatch.Elapsed;
-                    //string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-                    //Debug.Log(pointsToCheck[0][0]);
-                    //Debug.Log(pointsToCheck[0][1]);
-                    //Debug.Log(pointsToCheck[1][0]);
-                    //Debug.Log(pointsToCheck[1][1]);
-                    //Debug.Log(pointsToCheck.Count());
-                    lineScore.SetFunction(pointsToCheck[0][0], pointsToCheck[0][1], pointsToCheck[pointsToCheck.Count - 1][0], pointsToCheck[pointsToCheck.Count - 1][1]);
-                    Debug.Log(lineScore.Scoring(pointsToCheck));
-                    pointsToCheck.Clear();
+                        stopWatch.Stop();
+                        TimeSpan ts = stopWatch.Elapsed;
+                        lineScore.SetFunction(pointsToCheck[0][0], pointsToCheck[0][1], pointsToCheck[pointsToCheck.Count - 1][0], pointsToCheck[pointsToCheck.Count - 1][1]);
+                        tempScore += lineScore.Scoring(pointsToCheck);
+                        undoScore.Add(lineScore.Scoring(pointsToCheck));
+                        scorePopUp.ShowScore(lineScore.Scoring(pointsToCheck).ToString());
+                        pointsToCheck.Clear();
+                        releasePosFixed = new Vector2((Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f);
 
-                    releasePosFixed = new Vector2((Mathf.Round(detector.transform.position.x * 10f) / 10f) + 1f, (Mathf.Round(detector.transform.position.y * 10f) / 10f) - 0.4f);
-                    Debug.Log(arrayPoint[0]);
-                    if (arrayPoint[0] == releasePosFixed)
-                    {
-                        UnityEngine.Debug.Log("Shaped");
-                        AngleGenerator();
-                    }
-                    else if (releasePosFixed != arrayPoint[arrayPoint.Count - 1])
-                    {
-                        arrayPoint.Add(releasePosFixed);
+                        //Jika pengguna berhasil membuat gambar
+                        if (arrayPoint[0] == releasePosFixed)
+                        {
+                            UnityEngine.Debug.Log("Shaped");
+                            AngleGenerator();
+                            shaped = true;
+                        }
+                        else if (releasePosFixed != arrayPoint[arrayPoint.Count - 1])
+                        {
+                            arrayPoint.Add(releasePosFixed);
+                        }
                     }
                 }
             }
+            //LineRenderer lineHelper = gameObject.AddComponent<LineRenderer>()   
             
         }
 
+        public void Selesai()
+        {
+            tmWin.gameObject.SetActive(true);
+            tmWin.text = PresentUser.Name + "\ntelah berhasil!\n Score : " + lineScore.TotalScoring();
+            PresentUser.DatarScore = lineScore.TotalScoring();
+            
+        }
         private void ShapeRecognition(float[] point, int length)
         {
-            string shape;
             string jawaban;
             shape = "";
             //Segiempat
             if(length == 4)
             {
-                if(point[0] == 90 || point[1] == 90 || point[2] == 90 || point[3] == 90)
+                if(point[0] == 90 && point[1] == 90 && point[2] == 90 && point[3] == 90)
                 {
                     shape = "Persegi";
                 }
@@ -296,25 +328,36 @@ namespace Leap.Unity.DetectionExamples
             jawaban = examDisp.GetAnswer();
             if (String.Compare(examDisp.GetAnswer(), shape) == 0)
             {
-                Debug.Log("Total score :" + lineScore.TotalScoring());
-                Debug.Log("Jawaban anda benar yaitu " + jawaban);      
+                totalGambar += 1;
+                scorePopUp.ShowScore("Score gambar " + tempScore / length);
+                //Debug.Log("Total score :" + lineScore.TotalScoring());
+                Debug.Log("Jawaban anda benar yaitu " + jawaban);
                 examDisp.ShowExam();
             }
             else
             {
-                Debug.Log("Jawaban anda salah, yang benar adalah : " + jawaban);
+                Debug.Log("Jawaban bukan " + shape + ", yang benar adalah : " + jawaban);
             }
         }
 
         public void DeletAllLine()
         {
-            lineCounter = 0;
             //Destroy all sphere game object
-            GameObject[] sphere = GameObject.FindGameObjectsWithTag("sphere");
-            foreach (GameObject go in sphere)
+            foreach(int i in undoScore)
             {
-                Destroy(go);
+                Debug.Log(i);
             }
+            //GameObject[] sphere = GameObject.FindGameObjectsWithTag("sphere");
+            for( int i = ballPoint.Count-1; i >= 0; i--)
+            {
+                Destroy(ballPoint[i]);
+                ballPoint.RemoveAt(i);
+            }
+
+            //foreach (GameObject go in sphere)
+            //{
+            //    Destroy(go);
+            //}
 
             //Destroy all line game object
             GameObject[] line = GameObject.FindGameObjectsWithTag("line");
@@ -322,18 +365,27 @@ namespace Leap.Unity.DetectionExamples
             {
                 Destroy(go);
             }
+            for (int i = 0; i < undoScore.Count; i++)
+            {
+                undoScore.RemoveAt(i);
+            }
+            for (int i = 0; i < prepareToUndo.Count; i ++)
+            {
+                prepareToUndo.RemoveAt(i);
+            }
             drawingStatus = false;
             arrayPoint.Clear();
             lineHelper.DeleteLine();
-            Debug.Log("delete all obj");
+            shaped = false;
         }
 
         private void AngleGenerator()
         {
+            Debug.Log(arrayPoint.Count);
             int[] temp = new int[arrayPoint.Count];
             int a;
             int b;
-            float[] ad = new float[arrayPoint.Count];
+            float[] tempArray = new float[arrayPoint.Count];
             //Mencari verteks dari garis yang dibuat
             for(int i = 0; i < arrayPoint.Count; i ++)
             {
@@ -341,21 +393,43 @@ namespace Leap.Unity.DetectionExamples
                 b = (i + 2) % arrayPoint.Count;
                 Vector2 direction1 = arrayPoint[i] - arrayPoint[a];
                 Vector2 direction2 = arrayPoint[b] - arrayPoint[a];
-                ad[i] = Vector2.Angle(direction1, direction2);
+                tempArray[i] = Vector2.Angle(direction1, direction2);
+
             }
-            ShapeRecognition(ad, ad.Length);
+            ShapeRecognition(tempArray, tempArray.Length);
         }
-      
-        public void StartHelperDrawer()
+
+        public void Undo()
         {
-
+            if(undoScore.Count > 0)
+            {
+                tempScore -= undoScore[undoScore.Count - 1];
+                undoScore.RemoveLast();
+                //Debug.Log("tempScore " +tempScore);
+            }
+            if (shaped == true)
+            {
+                DeletAllLine();
+            }
+            else if (prepareToUndo.Count >= 1)
+            {
+                Debug.Log("array point " +arrayPoint.Count);
+                Destroy(prepareToUndo[prepareToUndo.Count - 1]);
+                arrayPoint.RemoveLast();
+                Destroy(ballPoint[ballPoint.Count - 1]);
+                lineHelper.DeleteLine();
+                ballPoint.RemoveLast();
+                if (prepareToUndo.Count == 1)
+                {
+                    Destroy(ballPoint[ballPoint.Count -1]);
+                    ballPoint.RemoveLast();
+                    arrayPoint.Clear();
+                    shaped = false;
+                }
+                prepareToUndo.RemoveLast();
+            }
+           
         }
-
-        public void EndHelperDrawer()
-        {
-
-        }
-
         [System.Serializable]
         private class DrawState
         {
@@ -363,7 +437,7 @@ namespace Leap.Unity.DetectionExamples
             private List<int> _tris = new List<int>();
             private List<Vector2> _uvs = new List<Vector2>();
             private List<Color> _colors = new List<Color>();
-
+            //private GameObject prepareToUndo;
             private PinchDraw _parent;
 
             private int _rings = 0;
@@ -408,7 +482,7 @@ namespace Leap.Unity.DetectionExamples
                 _mesh.MarkDynamic();
 
 
-                GameObject lineObj = new GameObject("Line Object");
+                GameObject lineObj = new GameObject("Line Object");              
                 lineObj.tag = "line";
                 lineObj.transform.position = Vector3.zero;
                 //lineObj.transform.position = _palette.transform.position;
@@ -417,7 +491,6 @@ namespace Leap.Unity.DetectionExamples
                 lineObj.AddComponent<MeshFilter>().mesh = _mesh;
                 Mesh smesh = lineObj.GetComponent<MeshFilter>().sharedMesh;
                 lineObj.AddComponent<MeshRenderer>().sharedMaterial = _parent._material;
-
                 return lineObj;
             }
 
@@ -541,6 +614,10 @@ namespace Leap.Unity.DetectionExamples
                 }
             }
 
+            //public GameObject GetUndoObj()
+            //{
+            //    return prepareToUndo;
+            //}
             //Connects the most recently added vertex ring to the one before it
             private void addTriSegment()
             {

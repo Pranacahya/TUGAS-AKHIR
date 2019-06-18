@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class ExamDisplayer : MonoBehaviour
 {
     [SerializeField]
     Renderer myImage;
 
-    SoalClass presentSoal = new SoalClass();
+    [SerializeField]
+    TMP_Text tm;
 
+    [SerializeField]
+    LineScoring ls;
+
+    SoalClass presentSoal = new SoalClass();
+    public int jumlahSoal = 2;
     List<SoalClass> soal = new List<SoalClass>();
 
     // Start is called before the first frame update
@@ -35,37 +43,37 @@ public class ExamDisplayer : MonoBehaviour
                 soal.Add(sC);
             }  
         }
-        //presentSoal = gameObject.GetComponent<SoalClass>();
         ShowExam();
-        //Texture examTexture = Resources.Load("Images/Soal/"+imageUrl) as Texture;
-        //myImage.texture = examTexture;
-        //myText = myTex.gameObject.GetComponent<Texture>();
-        //myText.
-
     }
 
     public void ShowExam()
     {
-        //Debug.Log("test");
-        int rand = Random.Range(0, soal.Count);
-        //Debug.Log(soal.Count);
-        presentSoal = soal[rand];
-        //Debug.Log(presentSoal.GetAnswer());
-        myImage = this.GetComponent<Renderer>();
-        //Debug.Log("test4");
-        myImage.material.mainTexture = presentSoal.GetShape();
-        //Debug.Log("test5");
-        //jawabanText.text = temp.GetAnswer();
-        //jawabanText.fontSize = 12;
-    }
-    // Update is called once per frame
-    void Update()
-    {
-
+        if (jumlahSoal > 0)
+        {
+            tm.text = jumlahSoal + "/10";
+            int rand = Random.Range(0, soal.Count);
+            presentSoal = soal[rand];
+            myImage = this.GetComponent<Renderer>();
+            myImage.material.mainTexture = presentSoal.GetShape();
+        }
+        else
+        {
+            tm.gameObject.SetActive(false);
+        }
+        jumlahSoal -= 1;
     }
 
     public string GetAnswer()
     {
         return presentSoal.GetAnswer();
+    }
+
+    public void Exit()
+    {
+        if(jumlahSoal <= 0 )
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
+       
     }
 }
